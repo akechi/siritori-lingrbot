@@ -60,32 +60,32 @@ func search(text string) string {
 	rs := []rune(text)
 	r := rs[len(rs)-1]
 
-    f, err := os.Open(filepath.Join(cwd, "dict.txt"))
-    if err != nil {
-        return ""
-    }
-    defer f.Close()
-    buf := bufio.NewReader(f)
+	f, err := os.Open(filepath.Join(cwd, "dict.txt"))
+	if err != nil {
+		return ""
+	}
+	defer f.Close()
+	buf := bufio.NewReader(f)
 
-    words := []string{}
-    for {
-        b, _, err := buf.ReadLine()
-        if err != nil {
-            break
-        }
-        line := string(b)
-        if ([]rune(line))[0] == r {
-            words = append(words, line)
-        }
-    }
-    if len(words) == 0 {
-        return ""
-    }
-    return words[rand.Int()%len(words)]
+	words := []string{}
+	for {
+		b, _, err := buf.ReadLine()
+		if err != nil {
+			break
+		}
+		line := string(b)
+		if ([]rune(line))[0] == r {
+			words = append(words, line)
+		}
+	}
+	if len(words) == 0 {
+		return ""
+	}
+	return words[rand.Int()%len(words)]
 }
 
 func shiritori(text string) string {
-    text = strings.Replace(text, "ー", "", -1)
+	text = strings.Replace(text, "ー", "", -1)
 	if rand.Int()%2 == 0 {
 		text = hira2kana(text)
 	} else {
@@ -116,7 +116,7 @@ func main() {
 					}
 					rs := []rune(s)
 					if rs[len(rs)-1] == 'ん' || rs[len(rs)-1] == 'ン' {
-							s += "\nあっ..."
+						s += "\nあっ..."
 					}
 					return s
 				}
