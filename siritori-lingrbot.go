@@ -14,6 +14,7 @@ import (
 )
 
 var re = regexp.MustCompile(`^(\S+)\s+#(しりとり|siritori)\s*$`)
+var re2 = regexp.MustCompile(`^\s+##(しりとり|siritori)\s*$`)
 
 var cwd string
 
@@ -94,12 +95,34 @@ func shiritori(text string) string {
 	return search(text)
 }
 
+func handleText(text string) string {
+	rs := []rune(strings.TrimSpace(text))
+	if len(rs) == 0 {
+		return "しばくぞ"
+	}
+	if rs[len(rs)-1] == 'ん' || rs[len(rs)-1] == 'ン' {
+		return "勝った（笑）"
+	}
+	s := shiritori(text)
+	if s == "" {
+		return "わかりません"
+	}
+	rs = []rune(s)
+	if rs[len(rs)-1] == 'ん' || rs[len(rs)-1] == 'ン' {
+		s += "\nあっ..."
+	}
+	return s
+}
+
 func main() {
 	flag.Parse()
 
 	cwd = filepath.Dir(os.Args[0])
 
 	rand.Seed(time.Now().UnixNano())
+
+	siritoriMode := false
+
 	web.Post("/", func(ctx *web.Context) string {
 		status, err := lingr.DecodeStatus(ctx.Request.Body)
 		if err != nil {
@@ -109,21 +132,13 @@ func main() {
 		for _, event := range status.Events {
 			if message := event.Message; message != nil {
 				text := message.Text
-				if re.MatchString(text) {
+				if siritoriMode {
+					return handleText(text)
+				} else if re.MatchString(text) {
 					text = re.FindStringSubmatch(text)[1]
-					rs := []rune(text)
-					if rs[len(rs)-1] == 'ん' || rs[len(rs)-1] == 'ン' {
-						return "勝った（笑）"
-					}
-					s := shiritori(text)
-					if s == "" {
-						return "わかりません"
-					}
-					rs = []rune(s)
-					if rs[len(rs)-1] == 'ん' || rs[len(rs)-1] == 'ン' {
-						s += "\nあっ..."
-					}
-					return s
+					return handleText(text)
+				} else if re2.MatchString(text) {
+					siritoriMode = !siritoriMode
 				}
 			}
 		}
