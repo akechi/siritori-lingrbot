@@ -14,7 +14,7 @@ import (
 )
 
 var re = regexp.MustCompile(`^(\S+)\s+#(しりとり|siritori)\s*$`)
-var re2 = regexp.MustCompile(`^\s+##(しりとり|siritori)\s*$`)
+var re2 = regexp.MustCompile(`^\s*#(しりとり|siritori)!\s*$`)
 
 var cwd string
 
@@ -121,7 +121,7 @@ func main() {
 
 	rand.Seed(time.Now().UnixNano())
 
-	siritoriMode := false
+	siritoriMode := map[string]bool{}
 
 	web.Post("/", func(ctx *web.Context) string {
 		status, err := lingr.DecodeStatus(ctx.Request.Body)
@@ -132,13 +132,19 @@ func main() {
 		for _, event := range status.Events {
 			if message := event.Message; message != nil {
 				text := message.Text
-				if siritoriMode {
+				current, _ := siritoriMode[message.Room]
+				if re2.MatchString(text) {
+					current = !current
+					siritoriMode[message.Room] = current
+					if current {
+						return "しりとりモード オン"
+					}
+					return "しりとりモード オフ"
+				} else if current {
 					return handleText(text)
 				} else if re.MatchString(text) {
 					text = re.FindStringSubmatch(text)[1]
 					return handleText(text)
-				} else if re2.MatchString(text) {
-					siritoriMode = !siritoriMode
 				}
 			}
 		}
