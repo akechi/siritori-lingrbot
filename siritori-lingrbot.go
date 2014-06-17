@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-var re = regexp.MustCompile(`^(\S+)\s+#しりとり\s*$`)
+var re = regexp.MustCompile(`^(\S+)\s+#(しりとり|siritori)\s*$`)
 
 var cwd string
 
