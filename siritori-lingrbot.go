@@ -113,6 +113,8 @@ func main() {
 					s := shiritori(re.FindStringSubmatch(text)[1])
 					if s == "" {
 						return "わかりません"
+					} else if s[len(s)-1] == 'ん' || s[len(s)-1] == 'ン' {
+						return "勝った（笑）"
 					}
 					rs := []rune(s)
 					if rs[len(rs)-1] == 'ん' || rs[len(rs)-1] == 'ン' {
