@@ -110,13 +110,15 @@ func main() {
 			if message := event.Message; message != nil {
 				text := message.Text
 				if re.MatchString(text) {
+					rs := []rune(text)
+					if rs[len(rs)-1] == 'ん' || rs[len(rs)-1] == 'ン' {
+						return "勝った（笑）"
+					}
 					s := shiritori(re.FindStringSubmatch(text)[1])
 					if s == "" {
 						return "わかりません"
-					} else if s[len(s)-1] == 'ん' || s[len(s)-1] == 'ン' {
-						return "勝った（笑）"
 					}
-					rs := []rune(s)
+					rs = []rune(s)
 					if rs[len(rs)-1] == 'ん' || rs[len(rs)-1] == 'ン' {
 						s += "\nあっ..."
 					}
